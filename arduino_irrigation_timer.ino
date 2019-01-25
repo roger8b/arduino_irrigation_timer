@@ -7,11 +7,12 @@
 #define pump 10
 #define pumpLed 13
 
-long min = 0;
-long hour = 0;
-
 
 static long previousMillis;
+static long minuteAcc;
+static long hourAcc;
+
+static long pumpStartTime = 3;
 
 void setup() {
   pinMode(pump, OUTPUT);
@@ -21,15 +22,37 @@ void setup() {
 }
 
 void loop() {
+  minuteCounter();
+  hourCounter();
   if (digitalRead(waterLevel) == HIGH) {
-    //OnOffBlink(15000, 14400000); //OnOffBlink(tOn, tOff);
-    OnOffBlink(10000, 30000); //OnOffBlink(tOn, tOff);
+    if (hourAcc >= pumpStartTime) {
+      digitalWrite(pump, HIGH);
+      delay(10000);
+      digitalWrite(pump, LOW);
+      hourAcc = 0;
+    }
     digitalWrite(waterLevelAlarm, LOW);
   } else {
     digitalWrite(pump, LOW);
     digitalWrite(pumpLed, LOW);
     digitalWrite(waterLevelAlarm, HIGH);
     previousMillis = millis();
+  }
+}
+
+void minuteCounter() {
+  if ((millis() - previousMillis) >= 60000) {
+    previousMillis = millis();
+    minuteAcc = minuteAcc + 1;
+    digitalWrite(pumpLed, !digitalRead(pumpLed));
+
+  }
+}
+
+void hourCounter() {
+  if (minuteAcc >= 60) {
+    hourAcc = hourAcc + 1;
+    minuteAcc = 0;
   }
 }
 
