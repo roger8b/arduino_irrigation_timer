@@ -12,7 +12,8 @@ static long previousMillis;
 static long minuteAcc;
 static long hourAcc;
 
-static long pumpStartTime = 3;
+static long pumpTimeInverval = 3;
+static long timePumpOn = 15000;
 
 void setup() {
   pinMode(pump, OUTPUT);
@@ -25,9 +26,9 @@ void loop() {
   minuteCounter();
   hourCounter();
   if (digitalRead(waterLevel) == HIGH) {
-    if (hourAcc >= pumpStartTime) {
+    if (hourAcc >= pumpTimeInverval) {
       digitalWrite(pump, HIGH);
-      delay(10000);
+      delay(timePumpOn);
       digitalWrite(pump, LOW);
       hourAcc = 0;
     }
